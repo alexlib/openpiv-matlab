@@ -403,7 +403,8 @@ set(handles.axes1,'Units','pixels');
 %     imshow(prepfun(tmp));
 % end
 
-im = openpiv_imread(handles,1);
+filename = fullfile(handles.path,handles.files{1});
+im = openpiv_imread(filename);
 imshow(im);
 set(handles.prev_image,'Visible','On');
 set(handles.next_image,'Visible','On');
@@ -463,10 +464,10 @@ end
 set(handles.figure1,'pointer','watch')
 
 % 
-% image1 = fullfile(handles.path,handles.files{1});
-% image2 = fullfile(handles.path,handles.files{2});
+image1 = fullfile(handles.path,handles.files{1});
+image2 = fullfile(handles.path,handles.files{2});
 
-[a,b] = read_pair_of_images_rect(handles,1,1,cropvec,ittWidth,ittHeight,ovlapHor,ovlapVer);
+[a,b] = read_pair_of_images_rect(image1,image2,cropvec,ittWidth,ittHeight,ovlapHor,ovlapVer);
 if isempty(a) || isempty(b)
     errordlg('Something wrong with your images')
 end
@@ -987,8 +988,10 @@ function openpiv_main_loop(handles, fileind, jump, cropvec,ittWidth,...
 set(handles.edit_num,'string',sprintf('%d',fileind));
 
 
+image1 = fullfile(handles.path,handles.files{fileind});
+image2 = fullfile(handles.path,handles.files{fileind+jump});
 
-[a,~,a1,b1,origin] = read_pair_of_images_rect(handles,fileind,jump,cropvec,ittWidth,ittHeight,ovlapHor,ovlapVer);
+[a,~,a1,b1,origin] = read_pair_of_images_rect(image1,image2,cropvec,ittWidth,ittHeight,ovlapHor,ovlapVer);
 
 % a1 = prepfun(a1);
 % b1 = prepfun(b1);
@@ -1036,6 +1039,9 @@ for m = rows % vertically
             v = 0;
             y = origin(2) + m + ittHeight/2 - 1;
             x = origin(1) + k + ittWidth/2 -  1;
+
+            resind = resind + 1;
+            res(resind,:) = [x y 0.0 0.0 0.0];
             continue
         end
         
